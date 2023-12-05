@@ -6,16 +6,14 @@ using UnityEngine;
 public class RTSCamera : MonoBehaviour
 {
 
-    float speed = 10.0f;
-    float zoomSpeed = 200.0f;
-    float rotationSpeed = 0.1f;
-    float minZoom = 3.0f;
-    float maxZoom = 30.0f;
+    float speed = 10.0f; // navigation speed when using WASD keys
+    float zoomSpeed = 200.0f; // zoom speed when scrolling mouse wheel
+    float rotationSpeed = 0.1f; // rotation speed on middle mouse button
+    float minZoom = 3.0f; // minimum zoom distance
+    float maxZoom = 30.0f; // maximum zoom distance
 
     Vector2 p1;
     Vector2 p2;
-
-
     void Update()
     {
 
@@ -73,8 +71,8 @@ public class RTSCamera : MonoBehaviour
         if (Input.GetMouseButton(2))   // check middle mouse button held
         {
             p2 = Input.mousePosition;
-            float dx = (p2 - p1).x * rotationSpeed ;
-            float dy = (p2 - p1).y * rotationSpeed ;
+            float dx = (p2 - p1).x * rotationSpeed;
+            float dy = (p2 - p1).y * rotationSpeed;
 
             transform.Rotate(new Vector3(0, dx, 0), Space.World);
             transform.Rotate(new Vector3(-dy, 0, 0), Space.Self);
