@@ -17,7 +17,7 @@ public class RTSCamera : MonoBehaviour
     void Update()
     {
 
-        if (Input.GetKey(KeyCode.LeftShift))
+        if (Input.GetKey(KeyCode.LeftShift)) // camera speed up when holding left shift
         {
             speed = 20.0f;
             zoomSpeed = 400.0f;
@@ -28,10 +28,9 @@ public class RTSCamera : MonoBehaviour
             zoomSpeed = 200.0f;
         }
 
-        float horizontalSpeed = speed * Input.GetAxis("Horizontal") * Time.deltaTime;
-        float verticalSpeed = speed * Input.GetAxis("Vertical") * Time.deltaTime;
-        float scrollSpeed = (float)(Math.Log(transform.position.y) * -zoomSpeed * Input.GetAxis("Mouse ScrollWheel") * Time.deltaTime);
-
+        float horizontalSpeed = speed * Input.GetAxis("Horizontal") * Time.deltaTime; // speed at which camera moves left and right
+        float verticalSpeed = speed * Input.GetAxis("Vertical") * Time.deltaTime; // speed at which camera moves forward and backward
+        float scrollSpeed = (float)(Math.Log(transform.position.y) * -zoomSpeed * Input.GetAxis("Mouse ScrollWheel") * Time.deltaTime); // speed at which camera zooms in and out
 
         if ((transform.position.y <= minZoom && (scrollSpeed < 0)) || (transform.position.y >= maxZoom && (scrollSpeed > 0)))
         {
