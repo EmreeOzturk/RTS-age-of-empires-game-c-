@@ -20,9 +20,9 @@ public class Mechanics : MonoBehaviour
         {
             RaycastHit hit;
             Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
-            if (Physics.Raycast(ray, out hit))
+            if (Physics.Raycast(ray, out hit, Mathf.Infinity, LayerMask.GetMask("Building", "Unit")))
             {
-                if (hit.transform.gameObject.TryGetComponent<MeshRenderer>(out var obj) && obj.material != choosenMaterial && obj.gameObject.layer != 6)
+                if (hit.transform.gameObject.TryGetComponent<MeshRenderer>(out var obj) && obj.material != choosenMaterial)
                 {
                     if (oldObject != null)
                     {
@@ -32,6 +32,14 @@ public class Mechanics : MonoBehaviour
                     oldObject = hit.transform.gameObject;
                 }
                 Debug.Log(hit.transform.gameObject.name);
+            }
+            else
+            {
+                if (oldObject != null)
+                {
+                    oldObject.GetComponent<MeshRenderer>().material = normalMaterial;
+                    oldObject = null;
+                }
             }
         }
     }
