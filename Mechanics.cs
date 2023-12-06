@@ -6,41 +6,57 @@ public class Mechanics : MonoBehaviour
 {
     public Material normalMaterial;
     public Material choosenMaterial;
-    public GameObject oldObject;
+    GameObject oldObject;
     // Start is called before the first frame update
     void Start()
     {
 
     }
 
+
     // Update is called once per frame
     void Update()
     {
         if (Input.GetMouseButtonDown(0))
-        {
-            RaycastHit hit;
-            Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
-            if (Physics.Raycast(ray, out hit, Mathf.Infinity, LayerMask.GetMask("Building", "Unit")))
+        {  // if left button pressed...
+            RaycastHit hit;           // create a variable that will store the raycast hit information
+            Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition); // create a ray from the camera to the mouse position
+            if (Physics.Raycast(ray, out hit, Mathf.Infinity, LayerMask.GetMask("Building", "Unit")))  // if the raycast hits something on the "Building" layer or the "Unit" layer...
             {
-                if (hit.transform.gameObject.TryGetComponent<MeshRenderer>(out var obj) && obj.material != choosenMaterial)
+                if (hit.transform.gameObject.TryGetComponent<MeshRenderer>(out var obj) && obj.material != choosenMaterial) // if the object has a MeshRenderer component and the object is not already selected...
                 {
-                    if (oldObject != null)
+                    if (oldObject != null)  // if there is an old object selected...
                     {
-                        oldObject.GetComponent<MeshRenderer>().material = normalMaterial;
+                        oldObject.GetComponent<MeshRenderer>().material = normalMaterial; // set the old object's material to the normal material
                     }
-                    obj.material = choosenMaterial;
-                    oldObject = hit.transform.gameObject;
+
+                    obj.material = choosenMaterial;  // set the new object's material to the choosen material
+                    oldObject = hit.transform.gameObject; // set the old object to the new object
                 }
-                Debug.Log(hit.transform.gameObject.name);
             }
-            else
+            else // if the raycast does not hit anything on the "Building" layer or the "Unit" layer...
             {
                 if (oldObject != null)
                 {
-                    oldObject.GetComponent<MeshRenderer>().material = normalMaterial;
-                    oldObject = null;
+                    oldObject.GetComponent<MeshRenderer>().material = normalMaterial; // set the old object's material to the normal material
+                    oldObject = null; // set the old object to null
                 }
+            }
+        }
+        if (Input.GetMouseButtonDown(1) && oldObject != null && oldObject.layer == LayerMask.NameToLayer("Unit")) // if right button pressed and there is an old object selected...
+        {
+            Debug.Log("Right button pressed" + oldObject);
+            RaycastHit hit;           // create a variable that will store the raycast hit information
+            Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition); // create a ray from the camera to the mouse position
+            if (Physics.Raycast(ray, out hit, Mathf.Infinity, LayerMask.GetMask("Plane")))  // if the raycast hits something on the "Ground" layer...
+            {
+                Debug.Log("Ground hit" + oldObject.name);
+                oldObject.GetComponentInParent<Uunit>().MoveUnit(hit.point); // move the unit to the hit point
             }
         }
     }
 }
+
+// select object on click
+// if object is unit  - can move unit
+// if object is building - can build unit
