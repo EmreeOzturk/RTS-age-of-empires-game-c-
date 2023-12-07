@@ -5,7 +5,7 @@ using UnityEngine.AI;
 
 public class Uunit : MonoBehaviour
 {
-    public NavMeshAgent agent;
+    NavMeshAgent agent; // the NavMeshAgent component of the unit
     // Start is called before the first frame update
     void Start()
     {

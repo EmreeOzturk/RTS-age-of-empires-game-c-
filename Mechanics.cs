@@ -45,18 +45,12 @@ public class Mechanics : MonoBehaviour
         }
         if (Input.GetMouseButtonDown(1) && oldObject != null && oldObject.layer == LayerMask.NameToLayer("Unit")) // if right button pressed and there is an old object selected...
         {
-            Debug.Log("Right button pressed" + oldObject);
             RaycastHit hit;           // create a variable that will store the raycast hit information
             Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition); // create a ray from the camera to the mouse position
             if (Physics.Raycast(ray, out hit, Mathf.Infinity, LayerMask.GetMask("Plane")))  // if the raycast hits something on the "Ground" layer...
             {
-                Debug.Log("Ground hit" + oldObject.name);
                 oldObject.GetComponentInParent<Uunit>().MoveUnit(hit.point); // move the unit to the hit point
             }
         }
     }
 }
-
-// select object on click
-// if object is unit  - can move unit
-// if object is building - can build unit
