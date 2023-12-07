@@ -27,9 +27,11 @@ public class UnitSelection : MonoBehaviour
     public void ClickSelect(GameObject unitToAdd)
     {
         DeselectAll();
-        if (selectedUnits.Contains(unitToAdd))
-        selectedUnits.Add(unitToAdd);
-        unitToAdd.transform.GetChild(0).gameObject.SetActive(true);
+        if (!selectedUnits.Contains(unitToAdd))
+        {
+            selectedUnits.Add(unitToAdd);
+            unitToAdd.transform.GetChild(0).gameObject.SetActive(true);
+        }
     }
     public void ShiftClickSelect(GameObject unitToAdd)
     {
@@ -67,15 +69,24 @@ public class UnitSelection : MonoBehaviour
     }
     void Update()
     {
-
-        // if (Input.GetMouseButtonDown(1) && oldObject != null && oldObject.layer == LayerMask.NameToLayer("Unit")) // if right button pressed and there is an old object selected...
-        // {
-        //     RaycastHit hit;           // create a variable that will store the raycast hit information
-        //     Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition); // create a ray from the camera to the mouse position
-        //     if (Physics.Raycast(ray, out hit, Mathf.Infinity, LayerMask.GetMask("Plane")))  // if the raycast hits something on the "Ground" layer...
-        //     {
-        //         oldObject.GetComponentInParent<Uunit>().MoveUnit(hit.point); // move the unit to the hit point
-        //     }
-        // }
+        if (Input.GetMouseButtonDown(1))
+        {
+            RaycastHit hit;           // create a variable that will store the raycast hit information
+            Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition); // create a ray from the camera to the mouse position
+            if (Physics.Raycast(ray, out hit, Mathf.Infinity, LayerMask.GetMask("Plane")))  // if the raycast hits something on the "Ground" layer...
+            {
+                foreach (GameObject unit in selectedUnits)
+                {
+                    if (!unit.TryGetComponent<Uunit>(out Uunit unitScript))
+                    {
+                        unit.GetComponentInParent<Uunit>().MoveUnit(hit.point);
+                    }
+                    else
+                    {
+                        unitScript.MoveUnit(hit.point);
+                    }
+                }
+            }
+        }
     }
 }
