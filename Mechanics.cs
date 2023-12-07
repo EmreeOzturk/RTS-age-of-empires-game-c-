@@ -7,18 +7,10 @@ public class Mechanics : MonoBehaviour
     public Material normalMaterial;
     public Material choosenMaterial;
     GameObject oldObject;
-    // Start is called before the first frame update
-    void Start()
-    {
-
-    }
-
-
-    // Update is called once per frame
     void Update()
     {
         if (Input.GetMouseButtonDown(0))
-        {  // if left button pressed...
+        {
             RaycastHit hit;           // create a variable that will store the raycast hit information
             Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition); // create a ray from the camera to the mouse position
             if (Physics.Raycast(ray, out hit, Mathf.Infinity, LayerMask.GetMask("Building", "Unit")))  // if the raycast hits something on the "Building" layer or the "Unit" layer...
