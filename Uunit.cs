@@ -10,14 +10,14 @@ public class Uunit : MonoBehaviour
     void Start()
     {
         agent = GetComponent<NavMeshAgent>();
+        UnitSelection.Instance.allUnitsInGame.Add(this.gameObject);
+    }
+    void OnDestroy()
+    {
+        UnitSelection.Instance.allUnitsInGame.Remove(this.gameObject);
     }
 
     // Update is called once per frame
-    void Update()
-    {
-
-    }
-
     public void MoveUnit(Vector3 destination)
     {
         agent.SetDestination(destination);
