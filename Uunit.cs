@@ -23,4 +23,9 @@ public class Uunit : MonoBehaviour
         agent.SetDestination(destination);
     }
 
+    public void SetNavMesh()
+    {
+        agent = GetComponent<NavMeshAgent>();
+    }
+
 }
