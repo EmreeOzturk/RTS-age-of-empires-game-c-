@@ -87,6 +87,21 @@ public class UnitSelection : MonoBehaviour
                     }
                 }
             }
+
+            if (Physics.Raycast(ray, out hit, Mathf.Infinity, LayerMask.GetMask("Resource")))  // if the raycast hits something on the "Ground" layer...
+            {
+                foreach (GameObject unit in selectedUnits)
+                {
+                    if (!unit.TryGetComponent<Uunit>(out Uunit unitScript))
+                    {
+                        unit.GetComponentInParent<Uunit>().MoveUnit(hit.point);
+                    }
+                    else
+                    {
+                        unitScript.MoveUnit(hit.point);
+                    }
+                }
+            }
         }
     }
 }
