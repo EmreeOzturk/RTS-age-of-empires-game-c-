@@ -58,15 +58,12 @@ public class Building : MonoBehaviour
     {
         if (Input.GetKeyDown(KeyCode.S) && (buildingType == BuildingType.House || buildingType == BuildingType.Barracks))
         {
-            Debug.Log("Spawning SSSS");
             isSpawning = !isSpawning;
-            Debug.Log("isSpawning: " + isSpawning);
             spawnPoint = this.transform.position + new Vector3(0, 0, 5);
         }
 
         if (isSpawning && (buildingType == BuildingType.House || buildingType == BuildingType.Barracks))
         {
-            Debug.Log("Girdi mi ?");
             spawnTimer -= Time.deltaTime;
             if (spawnTimer <= 0)
             {
@@ -80,7 +77,6 @@ public class Building : MonoBehaviour
 
     public void SpawnUnit()
     {
-        Debug.Log("Spawn unit");
         GameObject unit = Instantiate(spawnUnit, spawnPoint, Quaternion.identity);
         unit.GetComponent<Uunit>().SetNavMesh();
         unit.GetComponent<Uunit>().MoveUnit(spawnPoint + new Vector3(0, 0, 0.1f));

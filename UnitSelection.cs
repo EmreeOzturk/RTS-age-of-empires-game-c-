@@ -94,11 +94,11 @@ public class UnitSelection : MonoBehaviour
                 {
                     if (!unit.TryGetComponent<Uunit>(out Uunit unitScript))
                     {
-                        unit.GetComponentInParent<Uunit>().MoveUnit(hit.point);
+                        unit.GetComponentInParent<Uunit>().GoToResource(hit.collider.gameObject.GetComponent<Resource>());
                     }
                     else
                     {
-                        unitScript.MoveUnit(hit.point);
+                        unitScript.GoToResource(hit.collider.gameObject.GetComponent<Resource>());
                     }
                 }
             }
