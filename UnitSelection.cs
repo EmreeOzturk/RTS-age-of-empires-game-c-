@@ -73,7 +73,7 @@ public class UnitSelection : MonoBehaviour
         {
             RaycastHit hit;           // create a variable that will store the raycast hit information
             Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition); // create a ray from the camera to the mouse position
-            if (Physics.Raycast(ray, out hit, Mathf.Infinity, LayerMask.GetMask("Plane")))  // if the raycast hits something on the "Ground" layer...
+            if (Physics.Raycast(ray, out hit, Mathf.Infinity, LayerMask.GetMask("Plane")))
             {
                 foreach (GameObject unit in selectedUnits)
                 {
@@ -88,17 +88,19 @@ public class UnitSelection : MonoBehaviour
                 }
             }
 
-            if (Physics.Raycast(ray, out hit, Mathf.Infinity, LayerMask.GetMask("Resource")))  // if the raycast hits something on the "Ground" layer...
+            if (Physics.Raycast(ray, out hit, Mathf.Infinity, LayerMask.GetMask("Resource")))
             {
                 foreach (GameObject unit in selectedUnits)
                 {
                     if (!unit.TryGetComponent<Uunit>(out Uunit unitScript))
                     {
                         unit.GetComponentInParent<Uunit>().GoToResource(hit.collider.gameObject.GetComponent<Resource>());
+                        unit.GetComponentInParent<Uunit>().targetDestination = hit.collider.gameObject;
                     }
                     else
                     {
                         unitScript.GoToResource(hit.collider.gameObject.GetComponent<Resource>());
+                        unitScript.targetDestination = hit.collider.gameObject;
                     }
                 }
             }

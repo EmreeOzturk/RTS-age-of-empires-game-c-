@@ -1,42 +1,28 @@
 using System.Collections;
 using System.Collections.Generic;
+using RTS.Game.Units;
 using UnityEngine;
 
 public class Resource : MonoBehaviour
 {
-    public int resourceAmount = 100;
-    public int resourceCollectAmount = 10;
-    public float resourceCollectTime = 0.5f;
+    public float resourceAmount;
+    public float resourceCollectTime;
     public float resourceCollectTimeLeft = 0.0f;
     public bool isSelected = false;
-    public int type = 0; // 0 = wood, 1 = stone, 2 = gold
+    public int maxCollectors;
+    public int currentCollectors;
 
-    public void StartCollecting()
+    public enum ResourceType
     {
-        StartCoroutine(CollectResourceCoroutine());
+        Wood,
+        Stone,
+        Gold
     }
 
-    IEnumerator CollectResourceCoroutine()
-    {
-        while (isSelected)
-        {
-            CollectResource();
-            yield return new WaitForSeconds(1);
-        }
-    }
+    public ResourceType resourceType;
 
 
 
-    public void CollectResource()
-    {
-        resourceCollectTimeLeft -= Time.deltaTime;
-        if (resourceCollectTimeLeft <= 0.0f)
-        {
-            resourceCollectTimeLeft = resourceCollectTime;
-            resourceAmount -= resourceCollectAmount;
-            Debug.Log("Resource amount left: " + resourceAmount);
-        }
-    }
 
     void OnGUI()
     {
@@ -50,7 +36,11 @@ public class Resource : MonoBehaviour
 
     void Start()
     {
-
+        resourceAmount = Random.Range(100, 200);
+        resourceCollectTime = 0.5f;
+        resourceCollectTimeLeft = resourceCollectTime;
+        maxCollectors = 5;
+        currentCollectors = 0;
     }
 
     void Update()
@@ -58,6 +48,36 @@ public class Resource : MonoBehaviour
         if (resourceAmount <= 0)
         {
             Destroy(this.gameObject);
+        }
+    }
+
+    public bool Collect(Uunit unit)
+    {
+        Debug.Log("Collecting1111111");
+        Debug.Log(resourceAmount);
+        if (currentCollectors < maxCollectors)
+        {
+            unit.targetDestination = this.gameObject;
+            unit.resource = this;
+            switch (resourceType)
+            {
+                case ResourceType.Wood:
+                    unit.collectingType = Uunit.CollectingType.Wood;
+                    break;
+                case ResourceType.Stone:
+                    unit.collectingType = Uunit.CollectingType.Stone;
+                    break;
+                case ResourceType.Gold:
+                    unit.collectingType = Uunit.CollectingType.Gold;
+                    break;
+            }
+            Debug.Log("Collecting type: " + unit.collectingType);
+            currentCollectors++;
+            return true;
+        }
+        else
+        {
+            return false;
         }
     }
 
