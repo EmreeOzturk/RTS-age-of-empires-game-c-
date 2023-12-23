@@ -36,7 +36,7 @@ public class Resource : MonoBehaviour
 
     void Start()
     {
-        resourceAmount = Random.Range(100, 200);
+        resourceAmount = Random.Range(500, 800);
         resourceCollectTime = 0.5f;
         resourceCollectTimeLeft = resourceCollectTime;
         maxCollectors = 5;
@@ -72,7 +72,6 @@ public class Resource : MonoBehaviour
                     break;
             }
             Debug.Log("Collecting type: " + unit.collectingType);
-            currentCollectors++;
             return true;
         }
         else
