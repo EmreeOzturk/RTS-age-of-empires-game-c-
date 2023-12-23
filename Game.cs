@@ -16,11 +16,14 @@ public class Game : MonoBehaviour
     public GameObject unitPanel;
     public GameObject housePanel;
     public GameObject barracksPanel;
+    public GameObject constructivePanel;
 
     public BuildingSelection buildingSelection;
 
     public GameObject NotEnoughResourcesPanel;
     public GameObject SoldierCannotBuildPanel;
+
+    public GameObject researchSuccessPanel;
     public TextMeshProUGUI unitHealthText;
     public TextMeshProUGUI unitAttackText;
     public TextMeshProUGUI unitDefenceText;
@@ -32,6 +35,9 @@ public class Game : MonoBehaviour
     public int stone;
     public int gold;
 
+
+    public bool isSwordResearched;
+    public bool isArrowResearched;
     public GameObject collector;
     public GameObject soldier;
 
@@ -40,12 +46,75 @@ public class Game : MonoBehaviour
         stoneText.text = stone.ToString();
         goldText.text = gold.ToString();
         woodText.text = wood.ToString();
+
+        isSwordResearched = false;
+        isArrowResearched = false;
     }
 
-    IEnumerator HideMessage()
+    IEnumerator HideMessage(string type)
     {
         yield return new WaitForSeconds(1);
-        NotEnoughResourcesPanel.SetActive(false);
+        if (type == "notEnoughResources")
+        {
+            NotEnoughResourcesPanel.SetActive(false);
+        }
+        else if (type == "researchSuccess")
+        {
+            researchSuccessPanel.SetActive(false);
+        }
+
+    }
+
+    public void researchSword()
+    {
+        if (isSwordResearched == false)
+        {
+            if (gold >= 30 && wood >= 30 && stone >= 30)
+            {
+                gold -= 30;
+                wood -= 30;
+                stone -= 30;
+
+                stoneText.text = stone.ToString();
+                goldText.text = gold.ToString();
+                woodText.text = wood.ToString();
+                isSwordResearched = true;
+
+                researchSuccessPanel.SetActive(true);
+                StartCoroutine(HideMessage("researchSuccess"));
+            }
+            else
+            {
+                NotEnoughResourcesPanel.SetActive(true);
+                StartCoroutine(HideMessage("notEnoughResources"));
+            }
+        }
+    }
+
+    public void researchArrow()
+    {
+        if (isArrowResearched == false)
+        {
+            if (gold >= 30 && wood >= 30 && stone >= 30)
+            {
+                gold -= 30;
+                wood -= 30;
+                stone -= 30;
+
+                stoneText.text = stone.ToString();
+                goldText.text = gold.ToString();
+                woodText.text = wood.ToString();
+                isArrowResearched = true;
+
+                researchSuccessPanel.SetActive(true);
+                StartCoroutine(HideMessage("researchSuccess"));
+            }
+            else
+            {
+                NotEnoughResourcesPanel.SetActive(true);
+                StartCoroutine(HideMessage("notEnoughResources"));
+            }
+        }
     }
 
     public void SpawnUnit()
@@ -71,7 +140,7 @@ public class Game : MonoBehaviour
             else
             {
                 NotEnoughResourcesPanel.SetActive(true);
-                StartCoroutine(HideMessage());
+                StartCoroutine(HideMessage("notEnoughResources"));
             }
         }
         else if (building.GetComponent<Building>().buildingType == Building.BuildingType.House)
@@ -92,7 +161,7 @@ public class Game : MonoBehaviour
             else
             {
                 NotEnoughResourcesPanel.SetActive(true);
-                StartCoroutine(HideMessage());
+                StartCoroutine(HideMessage("notEnoughResources"));
             }
         }
     }
