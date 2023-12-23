@@ -4,6 +4,9 @@ public class Building : MonoBehaviour
 {
 
     public GameObject spawnUnit;
+    public GameObject archer;
+    public GameObject soldier;
+    public GameObject collector;
     public Vector3 spawnPoint;
 
 
