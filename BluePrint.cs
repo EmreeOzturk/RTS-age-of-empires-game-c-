@@ -27,7 +27,6 @@ public class BluePrint : MonoBehaviour
 
         unitSelection = GameObject.Find("_UnitSelectionSystem").GetComponentInChildren<UnitSelection>();
         unit = unitSelection.selectedUnits[0].GetComponentInParent<Uunit>().gameObject;
-        Debug.Log(unit.name);
     }
 
     // Update is called once per frame
@@ -46,7 +45,6 @@ public class BluePrint : MonoBehaviour
             if (!isClickedOnce)
             {
                 isClickedOnce = true;
-                Debug.Log("Clicked");
                 if (unit.GetComponent<Uunit>().unitState != Uunit.UnitState.GoingToBuilding)
                 {
                     Debug.Log("not going to building");
