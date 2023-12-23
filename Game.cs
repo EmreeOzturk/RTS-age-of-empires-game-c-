@@ -22,6 +22,8 @@ public class Game : MonoBehaviour
 
     public GameObject NotEnoughResourcesPanel;
     public GameObject SoldierCannotBuildPanel;
+    public GameObject swordResearchNeededPanel;
+    public GameObject arrowResearchNeededPanel;
 
     public GameObject researchSuccessPanel;
     public TextMeshProUGUI unitHealthText;
@@ -36,8 +38,8 @@ public class Game : MonoBehaviour
     public int gold;
 
 
-    public bool isSwordResearched;
-    public bool isArrowResearched;
+    bool isSwordResearched;
+    bool isArrowResearched;
     public GameObject collector;
     public GameObject soldier;
 
@@ -61,6 +63,14 @@ public class Game : MonoBehaviour
         else if (type == "researchSuccess")
         {
             researchSuccessPanel.SetActive(false);
+        }
+        else if (type == "swordResearchNeeded")
+        {
+            swordResearchNeededPanel.SetActive(false);
+        }
+        else if (type == "arrowResearchNeeded")
+        {
+            arrowResearchNeededPanel.SetActive(false);
         }
 
     }
@@ -117,11 +127,17 @@ public class Game : MonoBehaviour
         }
     }
 
-    public void SpawnUnit()
+    public void SpawnArcher()
     {
         GameObject building = BuildingSelection.Instance.selectedBuildings[0];
         if (building.GetComponent<Building>().buildingType == Building.BuildingType.Barracks)
         {
+            if (isArrowResearched == false)
+            {
+                arrowResearchNeededPanel.SetActive(true);
+                StartCoroutine(HideMessage("arrowResearchNeeded"));
+                return;
+            }
             if (wood >= 10 && stone >= 10 && gold >= 10)
             {
                 wood -= 10;
@@ -130,12 +146,42 @@ public class Game : MonoBehaviour
                 stoneText.text = stone.ToString();
                 goldText.text = gold.ToString();
                 woodText.text = wood.ToString();
-                GameObject unit = Instantiate(building.GetComponent<Building>().spawnUnit, building.GetComponent<Building>().spawnPoint, Quaternion.identity);
+                GameObject unit = Instantiate(building.GetComponent<Building>().archer, building.GetComponent<Building>().spawnPoint, Quaternion.identity);
                 unit.GetComponent<Uunit>().SetNavMesh();
                 unit.GetComponent<Uunit>().MoveUnit(building.GetComponent<Building>().spawnPoint + new Vector3(0, 0, 0.1f));
                 building.GetComponent<Building>().spawnPoint += new Vector3(0, 0, 1);
+            }
+            else
+            {
+                NotEnoughResourcesPanel.SetActive(true);
+                StartCoroutine(HideMessage("notEnoughResources"));
+            }
+        }
+    }
 
-
+    public void SpawnUnit()
+    {
+        GameObject building = BuildingSelection.Instance.selectedBuildings[0];
+        if (building.GetComponent<Building>().buildingType == Building.BuildingType.Barracks)
+        {
+            if (isSwordResearched == false)
+            {
+                swordResearchNeededPanel.SetActive(true);
+                StartCoroutine(HideMessage("swordResearchNeeded"));
+                return;
+            }
+            if (wood >= 10 && stone >= 10 && gold >= 10)
+            {
+                wood -= 10;
+                stone -= 10;
+                gold -= 10;
+                stoneText.text = stone.ToString();
+                goldText.text = gold.ToString();
+                woodText.text = wood.ToString();
+                GameObject unit = Instantiate(building.GetComponent<Building>().soldier, building.GetComponent<Building>().spawnPoint, Quaternion.identity);
+                unit.GetComponent<Uunit>().SetNavMesh();
+                unit.GetComponent<Uunit>().MoveUnit(building.GetComponent<Building>().spawnPoint + new Vector3(0, 0, 0.1f));
+                building.GetComponent<Building>().spawnPoint += new Vector3(0, 0, 1);
             }
             else
             {
@@ -153,7 +199,7 @@ public class Game : MonoBehaviour
                 stoneText.text = stone.ToString();
                 goldText.text = gold.ToString();
                 woodText.text = wood.ToString();
-                GameObject unit = Instantiate(building.GetComponent<Building>().spawnUnit, building.GetComponent<Building>().spawnPoint, Quaternion.identity);
+                GameObject unit = Instantiate(building.GetComponent<Building>().collector, building.GetComponent<Building>().spawnPoint, Quaternion.identity);
                 unit.GetComponent<Uunit>().SetNavMesh();
                 unit.GetComponent<Uunit>().MoveUnit(building.GetComponent<Building>().spawnPoint + new Vector3(0, 0, 0.1f));
                 building.GetComponent<Building>().spawnPoint += new Vector3(0, 0, 1);
