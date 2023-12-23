@@ -20,6 +20,7 @@ public class Game : MonoBehaviour
     public BuildingSelection buildingSelection;
 
     public GameObject NotEnoughResourcesPanel;
+    public GameObject SoldierCannotBuildPanel;
     public TextMeshProUGUI unitHealthText;
     public TextMeshProUGUI unitAttackText;
     public TextMeshProUGUI unitDefenceText;
