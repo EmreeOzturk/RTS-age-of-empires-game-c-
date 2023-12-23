@@ -1,5 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class Building : MonoBehaviour
@@ -13,21 +11,53 @@ public class Building : MonoBehaviour
     float spawnTimer;
     bool isSpawning;
 
+    public float requiredConstructionTime;
+    public float constructionTime;
+    public bool isConstructing;
+
+
 
     public enum BuildingType
     {
         House,
         Barracks,
-        ResourceCollector
+        ResourceCollector,
+        Constructive
+
     }
 
     public BuildingType buildingType;
+
+    public void StartConstruction()
+    {
+        isConstructing = true;
+        constructionTime = 0;
+    }
+
+    public void StopConstruction()
+    {
+        isConstructing = false;
+        constructionTime = requiredConstructionTime;
+    }
+
+    public void SpeedUpConstruction(float speedUpAmount)
+    {
+        constructionTime += speedUpAmount;
+        if (constructionTime >= requiredConstructionTime)
+        {
+            constructionTime = requiredConstructionTime;
+            isConstructing = false;
+        }
+    }
+
+
 
 
     void Start()
     {
 
         BuildingSelection.Instance.allBuildingsInGame.Add(this.gameObject);
+
         if (buildingType == BuildingType.House)
         {
             isSpawning = false;
@@ -48,7 +78,7 @@ public class Building : MonoBehaviour
         }
         else if (buildingType == BuildingType.ResourceCollector)
         {
-            
+
             isSpawning = false;
             spawnUnit = null;
         }
@@ -56,22 +86,6 @@ public class Building : MonoBehaviour
     }
     void Update()
     {
-        if (Input.GetKeyDown(KeyCode.S) && (buildingType == BuildingType.House || buildingType == BuildingType.Barracks))
-        {
-            isSpawning = !isSpawning;
-            spawnPoint = this.transform.position + new Vector3(0, 0, 5);
-        }
-
-        if (isSpawning && (buildingType == BuildingType.House || buildingType == BuildingType.Barracks))
-        {
-            spawnTimer -= Time.deltaTime;
-            if (spawnTimer <= 0)
-            {
-                SpawnUnit();
-            }
-        }
-
-
 
     }
 
