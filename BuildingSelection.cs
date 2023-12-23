@@ -40,6 +40,10 @@ public class BuildingSelection : MonoBehaviour
             {
                 game.GetComponent<Game>().barracksPanel.SetActive(false);
             }
+            else if (child.GetComponent<Building>().buildingType == Building.BuildingType.Constructive)
+            {
+                game.GetComponent<Game>().constructivePanel.SetActive(false);
+            }
             else if (child.GetComponent<Building>().buildingType == Building.BuildingType.ResourceCollector)
             {
                 // game.GetComponent<Game>().resourceCollectorPanel.SetActive(false);
@@ -48,9 +52,11 @@ public class BuildingSelection : MonoBehaviour
     }
     public void ClickSelect(GameObject buildingToAdd)
     {
+        Debug.Log("ClickSelect");
         DeselectAll();
         if (!selectedBuildings.Contains(buildingToAdd))
         {
+            Debug.Log("Adding building: " + buildingToAdd);
             selectedBuildings.Add(buildingToAdd);
             foreach (GameObject child in selectedBuildings)
             {
@@ -63,6 +69,10 @@ public class BuildingSelection : MonoBehaviour
                 else if (child.GetComponent<Building>().buildingType == Building.BuildingType.Barracks)
                 {
                     game.GetComponent<Game>().barracksPanel.SetActive(true);
+                }
+                else if (child.GetComponent<Building>().buildingType == Building.BuildingType.Constructive)
+                {
+                    game.GetComponent<Game>().constructivePanel.SetActive(true);
                 }
                 else if (child.GetComponent<Building>().buildingType == Building.BuildingType.ResourceCollector)
                 {
