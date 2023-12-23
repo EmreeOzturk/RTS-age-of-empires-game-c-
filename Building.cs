@@ -9,7 +9,6 @@ public class Building : MonoBehaviour
 
     float spawnTime;
     float spawnTimer;
-    bool isSpawning;
 
     public float requiredConstructionTime;
     public float constructionTime;
@@ -60,7 +59,6 @@ public class Building : MonoBehaviour
 
         if (buildingType == BuildingType.House)
         {
-            isSpawning = false;
             // spawnUnit = Resources.Load("Prefabs/Units/Collector") as Prefa;
             spawnTime = 3;
             spawnTimer = spawnTime;
@@ -69,7 +67,6 @@ public class Building : MonoBehaviour
         }
         else if (buildingType == BuildingType.Barracks)
         {
-            isSpawning = false;
             // spawnUnit = Resources.Load("Prefabs/Units/Soldier") as GameObject;
             spawnTime = 5;
             spawnTimer = spawnTime;
@@ -79,7 +76,6 @@ public class Building : MonoBehaviour
         else if (buildingType == BuildingType.ResourceCollector)
         {
 
-            isSpawning = false;
             spawnUnit = null;
         }
 
