@@ -1,7 +1,6 @@
-using System.Collections;
 using System.Collections.Generic;
-using Unity.VisualScripting;
 using UnityEngine;
+using UnityEngine.EventSystems;
 
 public class BuildingSelection : MonoBehaviour
 {
@@ -9,6 +8,8 @@ public class BuildingSelection : MonoBehaviour
     public List<GameObject> selectedBuildings = new();
     private static BuildingSelection _instance; // create a variable that will store the instance of this object
     public static BuildingSelection Instance { get { return _instance; } }
+
+    public GameObject game;
 
     private void Awake()
     {
@@ -31,6 +32,18 @@ public class BuildingSelection : MonoBehaviour
         foreach (GameObject child in allBuildingsInGame)
         {
             child.transform.GetChild(0).gameObject.SetActive(false);
+            if (child.GetComponent<Building>().buildingType == Building.BuildingType.House)
+            {
+                game.GetComponent<Game>().housePanel.SetActive(false);
+            }
+            else if (child.GetComponent<Building>().buildingType == Building.BuildingType.Barracks)
+            {
+                game.GetComponent<Game>().barracksPanel.SetActive(false);
+            }
+            else if (child.GetComponent<Building>().buildingType == Building.BuildingType.ResourceCollector)
+            {
+                // game.GetComponent<Game>().resourceCollectorPanel.SetActive(false);
+            }
         }
     }
     public void ClickSelect(GameObject buildingToAdd)
@@ -41,14 +54,30 @@ public class BuildingSelection : MonoBehaviour
             selectedBuildings.Add(buildingToAdd);
             foreach (GameObject child in selectedBuildings)
             {
-                Debug.Log("child: " + child);
+                Debug.Log("Selected building: " + child);
                 child.transform.GetChild(0).gameObject.SetActive(true);
+                if (child.GetComponent<Building>().buildingType == Building.BuildingType.House)
+                {
+                    game.GetComponent<Game>().housePanel.SetActive(true);
+                }
+                else if (child.GetComponent<Building>().buildingType == Building.BuildingType.Barracks)
+                {
+                    game.GetComponent<Game>().barracksPanel.SetActive(true);
+                }
+                else if (child.GetComponent<Building>().buildingType == Building.BuildingType.ResourceCollector)
+                {
+                    // game.GetComponent<Game>().resourceCollectorPanel.SetActive(true);
+                }
             }
         }
     }
 
     void Update()
     {
+        if (EventSystem.current.IsPointerOverGameObject())
+        {
+            return;
+        }
         if (Input.GetMouseButtonDown(0))
         {
             RaycastHit hit; // create a variable that will store the raycast hit information
