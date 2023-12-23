@@ -90,6 +90,7 @@ public class UnitSelection : MonoBehaviour
 
             if (Physics.Raycast(ray, out hit, Mathf.Infinity, LayerMask.GetMask("Resource")))
             {
+                Debug.Log("Resource clickeddddddddddddddddddddddddddd");
                 foreach (GameObject unit in selectedUnits)
                 {
                     if (!unit.TryGetComponent<Uunit>(out Uunit unitScript))
