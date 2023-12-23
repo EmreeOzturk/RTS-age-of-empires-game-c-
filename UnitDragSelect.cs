@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.EventSystems;
 
 public class UnitDragSelect : MonoBehaviour
 {
@@ -19,6 +20,10 @@ public class UnitDragSelect : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        if (EventSystem.current.IsPointerOverGameObject())
+        {
+            return;
+        }
         if (Input.GetMouseButtonDown(0))
         {
             startPos = Input.mousePosition;
@@ -52,19 +57,23 @@ public class UnitDragSelect : MonoBehaviour
 
     void DrawSelection()
     {
-        if(Input.mousePosition.x < startPos.x){
+        if (Input.mousePosition.x < startPos.x)
+        {
             selectionBox.xMin = Input.mousePosition.x;
             selectionBox.xMax = startPos.x;
         }
-        else{
+        else
+        {
             selectionBox.xMin = startPos.x;
             selectionBox.xMax = Input.mousePosition.x;
         }
-        if(Input.mousePosition.y < startPos.y){
+        if (Input.mousePosition.y < startPos.y)
+        {
             selectionBox.yMin = Input.mousePosition.y;
             selectionBox.yMax = startPos.y;
         }
-        else{
+        else
+        {
             selectionBox.yMin = startPos.y;
             selectionBox.yMax = Input.mousePosition.y;
         }
@@ -72,8 +81,10 @@ public class UnitDragSelect : MonoBehaviour
 
     void SelectUnits()
     {
-        foreach(GameObject unit in UnitSelection.Instance.allUnitsInGame){
-            if(selectionBox.Contains(cam.WorldToScreenPoint(unit.transform.position))){
+        foreach (GameObject unit in UnitSelection.Instance.allUnitsInGame)
+        {
+            if (selectionBox.Contains(cam.WorldToScreenPoint(unit.transform.position)))
+            {
                 UnitSelection.Instance.DragSelect(unit);
             }
         }
