@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -5,6 +6,18 @@ using UnityEngine.AI;
 
 public class Uunit : MonoBehaviour
 {
+
+    public string unitName;
+    public float health;
+    public float maxHealth;
+    public float attack;
+    public float defence;
+    public float spell;
+    public float maxSpell;
+    public float speed;
+
+    public Sprite icon;
+
     public enum UnitType
     {
         Collector,
@@ -18,21 +31,23 @@ public class Uunit : MonoBehaviour
         MovingToBuilding,
         Moving,
         Collecting,
-        Attacking
+        Attacking,
+        GoingToBuilding,
+        Building
     }
 
     public UnitType unitType;
     public UnitState unitState;
     public GameObject targetDestination;
     public GameObject resourceCollectorBuildingDestination;
-    public enum CollectingType { Wood, Stone, Gold }
+    public enum CollectingType { Wood, Stone, Gold, None }
     public CollectingType collectingType;
     public bool isCollector;
     public bool isCollectingNow;
     public float resourceCapacity;
     public Resource resource;
-    float receivedResources;
-    Game game;
+    public float receivedResources;
+    public Game game;
     public BuildingSelection buildingSelection;
     NavMeshAgent agent; // the NavMeshAgent component of the unit
     // Start is called before the first frame update
@@ -45,7 +60,14 @@ public class Uunit : MonoBehaviour
             resourceCapacity = 10;
             receivedResources = 0;
             game = GameObject.Find("_Game").GetComponent<Game>();
-
+            health = 100;
+            attack = 0;
+            defence = 0;
+            spell = 0;
+            speed = 5;
+            maxHealth = health;
+            unitName = "Collector";
+            icon = Resources.Load(unitName, typeof(Sprite)) as Sprite;
         }
         else if (unitType == UnitType.Soldier)
         {
@@ -53,6 +75,15 @@ public class Uunit : MonoBehaviour
             isCollectingNow = false;
             resourceCapacity = 0;
             receivedResources = 0;
+            health = 100;
+            attack = 10;
+            defence = 10;
+            spell = 0;
+            speed = 5;
+            maxHealth = health;
+            unitName = "Soldier";
+            icon = Resources.Load(unitName, typeof(Sprite)) as Sprite;
+
         }
         unitState = UnitState.Idle;
         agent = GetComponent<NavMeshAgent>();
@@ -61,7 +92,7 @@ public class Uunit : MonoBehaviour
 
     bool FindClosestCollectorBuilding()
     {
-        GameObject closestResource = null;
+        GameObject closestCollector = null;
         float closestDistance = Mathf.Infinity;
         foreach (GameObject building in BuildingSelection.Instance.allBuildingsInGame)
         {
@@ -71,14 +102,14 @@ public class Uunit : MonoBehaviour
                 if (distance < closestDistance)
                 {
                     closestDistance = distance;
-                    closestResource = building;
+                    closestCollector = building;
                 }
             }
         }
-        if (closestResource != null)
+        if (closestCollector != null)
         {
-            Debug.Log("Closest resource: " + closestResource);
-            resourceCollectorBuildingDestination = closestResource;
+            Debug.Log("Closest building: " + closestCollector);
+            resourceCollectorBuildingDestination = closestCollector;
             return true;
         }
         else
@@ -100,9 +131,43 @@ public class Uunit : MonoBehaviour
                 {
                     if (!agent.hasPath || agent.velocity.sqrMagnitude == 0f)
                     {
+                        resource = targetDestination.GetComponent<Resource>();
                         Debug.Log("Reached destination");
                         unitState = UnitState.Collecting;
+                        resource.currentCollectors++;
                         isCollectingNow = true;
+                    }
+                }
+            }
+        }
+
+        if (unitState == UnitState.GoingToBuilding)
+        {
+            if (!agent.pathPending)
+            {
+                if (agent.remainingDistance <= agent.stoppingDistance)
+                {
+                    if (!agent.hasPath || agent.velocity.sqrMagnitude == 0f)
+                    {
+                        Debug.Log("durdu");
+                        unitState = UnitState.Building;
+                    }
+                }
+            }
+        }
+
+
+        if (unitState == UnitState.Moving)
+        {
+            // Debug.Log("Girdi1");
+            if (!agent.pathPending)
+            {
+                if (agent.remainingDistance <= agent.stoppingDistance)
+                {
+                    if (!agent.hasPath || agent.velocity.sqrMagnitude == 0f)
+                    {
+                        Debug.Log("durdu");
+                        unitState = UnitState.Idle;
                     }
                 }
             }
@@ -135,7 +200,8 @@ public class Uunit : MonoBehaviour
                 {
                     Debug.Log("Moving to building");
                     unitState = UnitState.MovingToBuilding;
-                    MoveUnit(resourceCollectorBuildingDestination.transform.position);
+                    resource.currentCollectors--;
+                    MoveForCommand(resourceCollectorBuildingDestination.transform.position);
                 }
                 else
                 {
@@ -144,6 +210,7 @@ public class Uunit : MonoBehaviour
                 }
             }
         }
+        // binaya gidiyor
         if (unitState == UnitState.MovingToBuilding && isCollector)
         {
             if (!agent.pathPending)
@@ -157,17 +224,20 @@ public class Uunit : MonoBehaviour
                         {
                             case CollectingType.Wood:
                                 game.wood += (int)receivedResources;
+                                game.woodText.text = game.wood.ToString();
                                 break;
                             case CollectingType.Stone:
                                 game.stone += (int)receivedResources;
+                                game.stoneText.text = game.stone.ToString();
                                 break;
                             case CollectingType.Gold:
                                 game.gold += (int)receivedResources;
+                                game.goldText.text = game.gold.ToString();
                                 break;
                         }
                         receivedResources = 0;
                         unitState = UnitState.MovingToResource;
-                        MoveUnit(targetDestination.transform.position);
+                        MoveForCommand(targetDestination.transform.position);
                     }
                 }
             }
@@ -180,6 +250,14 @@ public class Uunit : MonoBehaviour
     }
     public void MoveUnit(Vector3 destination)
     {
+        unitState = UnitState.Moving;
+        collectingType = CollectingType.None;
+        isCollectingNow = false;
+        targetDestination = null;
+        resource = null;
+        resourceCollectorBuildingDestination = null;
+        receivedResources = 0;
+
         agent.SetDestination(destination);
     }
 
@@ -188,11 +266,30 @@ public class Uunit : MonoBehaviour
         agent = GetComponent<NavMeshAgent>();
     }
 
+    public void MoveToBuilding(Vector3 destination)
+    {
+        unitState = UnitState.GoingToBuilding;
+        collectingType = CollectingType.None;
+        isCollectingNow = false;
+        targetDestination = null;
+        resource = null;
+        resourceCollectorBuildingDestination = null;
+        receivedResources = 0;
+
+        agent.SetDestination(destination);
+    }
+
+
+    void MoveForCommand(Vector3 dest)
+    {
+        agent.SetDestination(dest);
+    }
+
 
     public void GoToResource(Resource r)
     {
         Debug.Log("Going to resource");
-        MoveUnit(r.transform.position + new Vector3(0, 0, 0.1f));
+        MoveForCommand(r.transform.position + new Vector3(0, 0, 0.1f));
         if (isCollector)
         {
             unitState = UnitState.MovingToResource;
