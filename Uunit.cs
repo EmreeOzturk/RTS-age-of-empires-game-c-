@@ -3,7 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
-
+using Photon.Pun;
 public class Uunit : MonoBehaviour
 {
 
@@ -15,6 +15,9 @@ public class Uunit : MonoBehaviour
     public float spell;
     public float maxSpell;
     public float speed;
+
+    PhotonView view;
+
 
     public Sprite icon;
 
@@ -53,6 +56,7 @@ public class Uunit : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+
         if (unitType == UnitType.Collector)
         {
             isCollector = true;
@@ -88,6 +92,8 @@ public class Uunit : MonoBehaviour
         unitState = UnitState.Idle;
         agent = GetComponent<NavMeshAgent>();
         UnitSelection.Instance.allUnitsInGame.Add(this.gameObject);
+        view = GetComponent<PhotonView>();
+
     }
 
     bool FindClosestCollectorBuilding()
@@ -121,123 +127,126 @@ public class Uunit : MonoBehaviour
 
     void Update()
     {
-        // kaynağa gidiyor
-        if (unitState == UnitState.MovingToResource && isCollector)
+        if (view.IsMine)
         {
-            // Debug.Log("Girdi1");
-            if (!agent.pathPending)
+            // kaynağa gidiyor
+            if (unitState == UnitState.MovingToResource && isCollector)
             {
-                if (agent.remainingDistance <= agent.stoppingDistance)
+                // Debug.Log("Girdi1");
+                if (!agent.pathPending)
                 {
-                    if (!agent.hasPath || agent.velocity.sqrMagnitude == 0f)
+                    if (agent.remainingDistance <= agent.stoppingDistance)
                     {
-                        resource = targetDestination.GetComponent<Resource>();
-                        Debug.Log("Reached destination");
-                        unitState = UnitState.Collecting;
-                        resource.currentCollectors++;
-                        isCollectingNow = true;
+                        if (!agent.hasPath || agent.velocity.sqrMagnitude == 0f)
+                        {
+                            resource = targetDestination.GetComponent<Resource>();
+                            Debug.Log("Reached destination");
+                            unitState = UnitState.Collecting;
+                            resource.currentCollectors++;
+                            isCollectingNow = true;
+                        }
                     }
                 }
             }
-        }
 
-        if (unitState == UnitState.GoingToBuilding)
-        {
-            if (!agent.pathPending)
+            if (unitState == UnitState.GoingToBuilding)
             {
-                if (agent.remainingDistance <= agent.stoppingDistance)
+                if (!agent.pathPending)
                 {
-                    if (!agent.hasPath || agent.velocity.sqrMagnitude == 0f)
+                    if (agent.remainingDistance <= agent.stoppingDistance)
                     {
-                        Debug.Log("durdu");
-                        unitState = UnitState.Building;
+                        if (!agent.hasPath || agent.velocity.sqrMagnitude == 0f)
+                        {
+                            Debug.Log("durdu");
+                            unitState = UnitState.Building;
+                        }
                     }
                 }
             }
-        }
 
 
-        if (unitState == UnitState.Moving)
-        {
-            // Debug.Log("Girdi1");
-            if (!agent.pathPending)
+            if (unitState == UnitState.Moving)
             {
-                if (agent.remainingDistance <= agent.stoppingDistance)
+                // Debug.Log("Girdi1");
+                if (!agent.pathPending)
                 {
-                    if (!agent.hasPath || agent.velocity.sqrMagnitude == 0f)
+                    if (agent.remainingDistance <= agent.stoppingDistance)
                     {
-                        Debug.Log("durdu");
+                        if (!agent.hasPath || agent.velocity.sqrMagnitude == 0f)
+                        {
+                            Debug.Log("durdu");
+                            unitState = UnitState.Idle;
+                        }
+                    }
+                }
+            }
+
+            // topluyor
+            if (isCollectingNow && isCollector && unitState == UnitState.Collecting)
+            {
+                // Debug.Log("Girdi2");
+
+                if (receivedResources < resourceCapacity)
+                {
+                    resource.resourceAmount -= Time.deltaTime * 2;
+                    if (resource.resourceAmount <= 0)
+                    {
+                        resource.resourceAmount = 0;
+                        isCollectingNow = false;
+                        unitState = UnitState.Idle;
+                    }
+                    receivedResources += Time.deltaTime * 2;
+                    // Debug.Log("Received resources: " + receivedResources);
+                }
+                // hepsini topladı bırakması lazım
+                else
+                {
+                    receivedResources = resourceCapacity;
+                    isCollectingNow = false;
+                    Debug.Log("Can't collect anymore");
+                    if (FindClosestCollectorBuilding())
+                    {
+                        Debug.Log("Moving to building");
+                        unitState = UnitState.MovingToBuilding;
+                        resource.currentCollectors--;
+                        MoveForCommand(resourceCollectorBuildingDestination.transform.position);
+                    }
+                    else
+                    {
+                        Debug.Log("No building found");
                         unitState = UnitState.Idle;
                     }
                 }
             }
-        }
-
-        // topluyor
-        if (isCollectingNow && isCollector && unitState == UnitState.Collecting)
-        {
-            // Debug.Log("Girdi2");
-
-            if (receivedResources < resourceCapacity)
+            // binaya gidiyor
+            if (unitState == UnitState.MovingToBuilding && isCollector)
             {
-                resource.resourceAmount -= Time.deltaTime * 2;
-                if (resource.resourceAmount <= 0)
+                if (!agent.pathPending)
                 {
-                    resource.resourceAmount = 0;
-                    isCollectingNow = false;
-                    unitState = UnitState.Idle;
-                }
-                receivedResources += Time.deltaTime * 2;
-                // Debug.Log("Received resources: " + receivedResources);
-            }
-            // hepsini topladı bırakması lazım
-            else
-            {
-                receivedResources = resourceCapacity;
-                isCollectingNow = false;
-                Debug.Log("Can't collect anymore");
-                if (FindClosestCollectorBuilding())
-                {
-                    Debug.Log("Moving to building");
-                    unitState = UnitState.MovingToBuilding;
-                    resource.currentCollectors--;
-                    MoveForCommand(resourceCollectorBuildingDestination.transform.position);
-                }
-                else
-                {
-                    Debug.Log("No building found");
-                    unitState = UnitState.Idle;
-                }
-            }
-        }
-        // binaya gidiyor
-        if (unitState == UnitState.MovingToBuilding && isCollector)
-        {
-            if (!agent.pathPending)
-            {
-                if (agent.remainingDistance <= agent.stoppingDistance)
-                {
-                    if (!agent.hasPath || agent.velocity.sqrMagnitude == 0f)
+                    if (agent.remainingDistance <= agent.stoppingDistance)
                     {
-                        Debug.Log("Reached building");
-                        switch (collectingType)
+                        if (!agent.hasPath || agent.velocity.sqrMagnitude == 0f)
                         {
-                            case CollectingType.Wood:
-                                game.wood += (int)receivedResources;
-                                game.woodText.text = game.wood.ToString();
-                                break;
-                            case CollectingType.Stone:
-                                game.stone += (int)receivedResources;
-                                game.stoneText.text = game.stone.ToString();
-                                break;
-                            case CollectingType.Gold:
-                                game.gold += (int)receivedResources;
-                                game.goldText.text = game.gold.ToString();
-                                break;
+                            Debug.Log("Reached building");
+                            switch (collectingType)
+                            {
+                                case CollectingType.Wood:
+                                    game.wood += (int)receivedResources;
+                                    game.woodText.text = game.wood.ToString();
+                                    break;
+                                case CollectingType.Stone:
+                                    game.stone += (int)receivedResources;
+                                    game.stoneText.text = game.stone.ToString();
+                                    break;
+                                case CollectingType.Gold:
+                                    game.gold += (int)receivedResources;
+                                    game.goldText.text = game.gold.ToString();
+                                    break;
+                            }
+                            receivedResources = 0;
+                            unitState = UnitState.MovingToResource;
+                            MoveForCommand(targetDestination.transform.position);
                         }
-                        receivedResources = 0;
-                        unitState = UnitState.MovingToResource;
-                        MoveForCommand(targetDestination.transform.position);
                     }
                 }
             }
